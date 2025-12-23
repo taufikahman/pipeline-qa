@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Header } from '@/components/Header';
+import { Navbar } from '@/components/Navbar';
+import { ProfileHero } from '@/components/ProfileHero';
 import { PipelineSimulator } from '@/components/PipelineSimulator';
 import { StageDetails } from '@/components/StageDetails';
 import { RunPipelineModal } from '@/components/RunPipelineModal';
@@ -19,8 +20,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container max-w-7xl mx-auto px-4 py-8">
-        <Header onRunPipeline={() => setIsModalOpen(true)} onReset={resetPipeline} />
+      <Navbar onRunPipeline={() => setIsModalOpen(true)} onReset={resetPipeline} />
+
+      <main className="container max-w-7xl mx-auto px-4 py-8">
+        <ProfileHero />
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <div className="lg:col-span-3">
@@ -35,7 +38,7 @@ const Index = () => {
             <StageDetails stage={selectedStage} />
           </div>
         </div>
-      </div>
+      </main>
 
       <RunPipelineModal
         open={isModalOpen}
