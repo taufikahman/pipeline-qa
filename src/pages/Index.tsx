@@ -5,6 +5,7 @@ import { PipelineSimulator } from '@/components/PipelineSimulator';
 import { StageDetails } from '@/components/StageDetails';
 import { RunPipelineModal } from '@/components/RunPipelineModal';
 import { OutputReport } from '@/components/OutputReport';
+import { EvidenceVault } from '@/components/EvidenceVault';
 import { usePipeline } from '@/hooks/usePipeline';
 
 const Index = () => {
@@ -41,6 +42,8 @@ const Index = () => {
         </div>
 
         <OutputReport stages={stages} releaseStatus={releaseStatus} />
+        
+        <EvidenceVault />
       </main>
 
       <RunPipelineModal
