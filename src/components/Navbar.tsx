@@ -10,6 +10,7 @@ interface NavbarProps {
 
 export function Navbar({ onRunPipeline, onReset }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const resumeHref = `${import.meta.env.BASE_URL}Resume_TaufikAhman.pdf`;
 
   return (
     <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
@@ -41,17 +42,13 @@ export function Navbar({ onRunPipeline, onReset }: NavbarProps) {
               <Archive size={14} className="mr-1.5" />
               Evidence Vault
             </Button>
-            <a href="/Resume_TaufikAhman.pdf" download>
-            <Button variant="ghost" size="sm">
-              <Download size={14} className="mr-1.5" />
-              Download CV
-            </Button>
+            <a href={resumeHref} download>
+              <Button variant="ghost" size="sm">
+                <Download size={14} className="mr-1.5" />
+                Download CV
+              </Button>
             </a>
-            <a
-              href="https://github.com/taufikahman"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a href="https://github.com/taufikahman" target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="icon" className="h-9 w-9">
                 <Github size={16} />
               </Button>
@@ -77,11 +74,25 @@ export function Navbar({ onRunPipeline, onReset }: NavbarProps) {
           )}
         >
           <div className="flex flex-col gap-2 pt-2">
-            <Button variant="default" size="sm" onClick={() => { onRunPipeline(); setMobileMenuOpen(false); }}>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => {
+                onRunPipeline();
+                setMobileMenuOpen(false);
+              }}
+            >
               <Play size={14} className="mr-2" />
               Run Pipeline
             </Button>
-            <Button variant="outline" size="sm" onClick={() => { onReset(); setMobileMenuOpen(false); }}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                onReset();
+                setMobileMenuOpen(false);
+              }}
+            >
               <RotateCcw size={14} className="mr-2" />
               Reset
             </Button>
@@ -90,14 +101,23 @@ export function Navbar({ onRunPipeline, onReset }: NavbarProps) {
               Evidence Vault
             </Button>
             <div className="flex gap-2">
-              <Button variant="ghost" size="sm" className="flex-1">
-                <Download size={14} className="mr-2" />
-                Download CV
-              </Button>
-              <Button variant="ghost" size="sm" className="flex-1">
-                <Github size={14} className="mr-2" />
-                GitHub
-              </Button>
+              <a href={resumeHref} download className="flex-1">
+                <Button variant="ghost" size="sm" className="w-full">
+                  <Download size={14} className="mr-2" />
+                  Download CV
+                </Button>
+              </a>
+              <a
+                href="https://github.com/taufikahman"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1"
+              >
+                <Button variant="ghost" size="sm" className="w-full">
+                  <Github size={14} className="mr-2" />
+                  GitHub
+                </Button>
+              </a>
             </div>
           </div>
         </div>
