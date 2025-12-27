@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { ProfileHero } from '@/components/ProfileHero';
 import { PipelineSimulator } from '@/components/PipelineSimulator';
@@ -7,6 +7,7 @@ import { RunPipelineModal } from '@/components/RunPipelineModal';
 import { OutputReport } from '@/components/OutputReport';
 import { EvidenceVault } from '@/components/EvidenceVault';
 import { usePipeline } from '@/hooks/usePipeline';
+import { usePipelineReports } from '@/hooks/usePipelineReports';
 
 const Index = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,10 +16,23 @@ const Index = () => {
     releaseStatus,
     selectedStageId,
     selectedStage,
+    isRunning,
     runPipeline,
     resetPipeline,
     selectStage,
   } = usePipeline();
+
+  const { reports, saveReport, exportReport } = usePipelineReports();
+
+  // Save report when pipeline finishes running
+  useEffect(() => {
+    if (!isRunning && stages.some(s => s.status !== 'pending')) {
+      const hasNewRun = stages.some(s => s.status === 'passed' || s.status === 'failed');
+      if (hasNewRun && (reports.length === 0 || reports[0]?.stages !== stages)) {
+        saveReport(stages, releaseStatus);
+      }
+    }
+  }, [isRunning]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -41,7 +55,12 @@ const Index = () => {
           </div>
         </div>
 
-        <OutputReport stages={stages} releaseStatus={releaseStatus} />
+        <OutputReport 
+          stages={stages} 
+          releaseStatus={releaseStatus}
+          reports={reports}
+          onExportReport={exportReport}
+        />
         
         <EvidenceVault />
       </main>

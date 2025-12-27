@@ -80,10 +80,11 @@ export function RunPipelineModal({
                   <SelectTrigger className="h-9 bg-muted border-border text-foreground rounded-lg">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border rounded-xl">
+                <SelectContent className="bg-card border-border rounded-xl">
                     <SelectItem value="AUTO">AUTO</SelectItem>
                     <SelectItem value="PASS">PASS</SelectItem>
                     <SelectItem value="FAIL">FAIL</SelectItem>
+                    <SelectItem value="SKIP">SKIP</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -94,6 +95,7 @@ export function RunPipelineModal({
         <div className="flex items-start gap-2 mt-4 p-3 bg-primary/5 rounded-xl border border-primary/10">
           <Info size={16} className="text-primary shrink-0 mt-0.5" />
           <p className="text-xs text-muted-foreground">
+            Set <span className="font-semibold text-foreground">SKIP</span> to keep stages pending.
             Set <span className="font-semibold text-foreground">Smoke</span> or{' '}
             <span className="font-semibold text-foreground">API</span> to FAIL to see the Quality Gate block
             the release.

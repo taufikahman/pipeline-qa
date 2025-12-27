@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Play, RotateCcw, Archive, Download, Github, Menu } from 'lucide-react';
+import { Play, RotateCcw, Archive, ExternalLink, Github, Menu } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -11,6 +11,18 @@ interface NavbarProps {
 export function Navbar({ onRunPipeline, onReset }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const resumeHref = `${import.meta.env.BASE_URL}Resume_TaufikAhman.pdf`;
+
+  const scrollToEvidenceVault = () => {
+    const element = document.getElementById('evidence-vault');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setMobileMenuOpen(false);
+  };
+
+  const openCVInNewTab = () => {
+    window.open(resumeHref, '_blank');
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-card/95 backdrop-blur-md border-b border-border">
@@ -38,16 +50,14 @@ export function Navbar({ onRunPipeline, onReset }: NavbarProps) {
               Reset
             </Button>
             <div className="w-px h-6 bg-border mx-2" />
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={scrollToEvidenceVault}>
               <Archive size={14} className="mr-1.5" />
               Evidence Vault
             </Button>
-            <a href={resumeHref} download>
-              <Button variant="ghost" size="sm">
-                <Download size={14} className="mr-1.5" />
-                Download CV
-              </Button>
-            </a>
+            <Button variant="ghost" size="sm" onClick={openCVInNewTab}>
+              <ExternalLink size={14} className="mr-1.5" />
+              View CV
+            </Button>
             <a href="https://github.com/taufikahman" target="_blank" rel="noopener noreferrer">
               <Button variant="ghost" size="icon" className="h-9 w-9">
                 <Github size={16} />
@@ -96,17 +106,15 @@ export function Navbar({ onRunPipeline, onReset }: NavbarProps) {
               <RotateCcw size={14} className="mr-2" />
               Reset
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={scrollToEvidenceVault}>
               <Archive size={14} className="mr-2" />
               Evidence Vault
             </Button>
             <div className="flex gap-2">
-              <a href={resumeHref} download className="flex-1">
-                <Button variant="ghost" size="sm" className="w-full">
-                  <Download size={14} className="mr-2" />
-                  Download CV
-                </Button>
-              </a>
+              <Button variant="ghost" size="sm" className="flex-1" onClick={openCVInNewTab}>
+                <ExternalLink size={14} className="mr-2" />
+                View CV
+              </Button>
               <a
                 href="https://github.com/taufikahman"
                 target="_blank"

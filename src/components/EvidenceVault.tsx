@@ -113,7 +113,7 @@ export const EvidenceVault = () => {
   });
 
   return (
-    <section className="mt-12">
+    <section id="evidence-vault" className="mt-12 scroll-mt-20">
       <div className="bg-card border border-border rounded-2xl p-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
