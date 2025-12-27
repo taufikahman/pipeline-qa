@@ -22,7 +22,7 @@ const Index = () => {
     selectStage,
   } = usePipeline();
 
-  const { reports, saveReport, exportReport } = usePipelineReports();
+  const { reports, saveReport } = usePipelineReports();
 
   // Save report when pipeline finishes running
   useEffect(() => {
@@ -59,7 +59,6 @@ const Index = () => {
           stages={stages} 
           releaseStatus={releaseStatus}
           reports={reports}
-          onExportReport={exportReport}
         />
         
         <EvidenceVault />
