@@ -1,6 +1,6 @@
 export type StageStatus = 'passed' | 'failed' | 'blocked' | 'running' | 'pending';
 export type StageType = 'STATIC' | 'MANUAL' | 'API' | 'UI' | 'PERF' | 'GATE';
-export type OutcomeConfig = 'AUTO' | 'PASS' | 'FAIL';
+export type OutcomeConfig = 'AUTO' | 'PASS' | 'FAIL' | 'SKIP';
 
 export interface LogEntry {
   prefix: string;
@@ -33,4 +33,12 @@ export interface PipelineState {
 export interface StageOutcome {
   stageId: string;
   outcome: OutcomeConfig;
+}
+
+export interface PipelineReport {
+  id: string;
+  runDate: Date;
+  stages: Stage[];
+  releaseStatus: 'pending' | 'passed' | 'blocked';
+  passRate: number;
 }

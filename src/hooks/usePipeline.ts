@@ -12,17 +12,30 @@ export function usePipeline() {
     setIsRunning(true);
     setSelectedStageId(null);
 
-    // Reset all stages to running
+    // Set stages to running only if not skipped
     setStages((prev) =>
-      prev.map((stage) => ({ ...stage, status: 'running' as StageStatus }))
+      prev.map((stage) => {
+        const outcome = outcomes.find(o => o.stageId === stage.id);
+        if (outcome?.outcome === 'SKIP') {
+          return { ...stage, status: 'pending' as StageStatus };
+        }
+        return { ...stage, status: 'running' as StageStatus };
+      })
     );
 
     // Process each stage with a delay for animation
     let allPassed = true;
+    let hasRunningStages = false;
 
     for (let i = 0; i < outcomes.length; i++) {
       const { stageId, outcome } = outcomes[i];
       
+      // Skip stages marked as SKIP
+      if (outcome === 'SKIP') {
+        continue;
+      }
+
+      hasRunningStages = true;
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       let finalStatus: StageStatus;
@@ -67,7 +80,9 @@ export function usePipeline() {
       }
     }
 
-    setReleaseStatus(allPassed ? 'passed' : 'blocked');
+    if (hasRunningStages) {
+      setReleaseStatus(allPassed ? 'passed' : 'blocked');
+    }
     setIsRunning(false);
 
     // If nothing selected, select quality gate
