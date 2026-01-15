@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
-import { Stage, StageOutcome, StageStatus } from '@/types/pipeline';
+import { Stage, StageOutcome, StageStatus, LogEntry } from '@/types/pipeline';
 import { initialStages, getPassedLogs, getFailedLogs } from '@/data/pipelineData';
+import { runPipeline as runPipelineApi } from '@/lib/api';
 
 export function usePipeline() {
   const [stages, setStages] = useState<Stage[]>(initialStages);
@@ -23,6 +24,70 @@ export function usePipeline() {
       })
     );
 
+    // Check if smoke-tests or ui-e2e is AUTO - trigger Playwright
+    const smokeOutcome = outcomes.find(o => o.stageId === 'smoke-tests');
+    const uiE2eOutcome = outcomes.find(o => o.stageId === 'ui-e2e');
+    const shouldRunPlaywright = 
+      (smokeOutcome?.outcome === 'AUTO' && smokeOutcome.outcome !== 'SKIP') ||
+      (uiE2eOutcome?.outcome === 'AUTO' && uiE2eOutcome.outcome !== 'SKIP');
+
+    let playwrightResult: { passed: boolean; logs: LogEntry[] } | null = null;
+
+    // Run Playwright tests if needed
+    if (shouldRunPlaywright) {
+      try {
+        console.log('🎭 Running Playwright tests...');
+        
+        // Update UI to show Playwright is running
+        setStages((prev) =>
+          prev.map((stage) => {
+            if (stage.id === 'smoke-tests' || stage.id === 'ui-e2e') {
+              return {
+                ...stage,
+                logs: [
+                  { prefix: '[playwright]', message: '🎭 Connecting to Playwright server...', type: 'normal' as const },
+                  { prefix: '[playwright]', message: 'Running automated tests...', type: 'normal' as const },
+                ],
+              };
+            }
+            return stage;
+          })
+        );
+
+        const response = await runPipelineApi();
+        
+        if (response.success) {
+          const testResults = response.data.testResults;
+          const passed = testResults.status === 'SUCCESS';
+          
+          playwrightResult = {
+            passed,
+            logs: [
+              { prefix: '[playwright]', message: '🎭 Playwright tests completed', type: 'normal' as const },
+              { prefix: '[playwright]', message: `Browser: chromium`, type: 'normal' as const },
+              { prefix: '[playwright]', message: `Total tests: ${testResults.total}`, type: 'normal' as const },
+              { prefix: '[playwright]', message: `Passed: ${testResults.passed}`, type: passed ? 'success' as const : 'normal' as const },
+              { prefix: '[playwright]', message: `Failed: ${testResults.failed}`, type: testResults.failed > 0 ? 'error' as const : 'normal' as const },
+              { prefix: '[playwright]', message: `Pass rate: ${testResults.pass_rate}%`, type: passed ? 'success' as const : 'warning' as const },
+              { prefix: '[playwright]', message: passed ? '✅ All tests passed!' : '❌ Some tests failed', type: passed ? 'success' as const : 'error' as const },
+            ],
+          };
+          
+          console.log('✅ Playwright tests completed:', testResults);
+        }
+      } catch (error) {
+        console.error('❌ Playwright tests failed:', error);
+        playwrightResult = {
+          passed: false,
+          logs: [
+            { prefix: '[playwright]', message: '🎭 Running Playwright tests...', type: 'normal' as const },
+            { prefix: '[playwright]', message: `❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`, type: 'error' as const },
+            { prefix: '[playwright]', message: 'Tests could not be completed', type: 'error' as const },
+          ],
+        };
+      }
+    }
+
     // Process each stage with a delay for animation
     let allPassed = true;
     let hasRunningStages = false;
@@ -39,6 +104,7 @@ export function usePipeline() {
       await new Promise((resolve) => setTimeout(resolve, 500));
 
       let finalStatus: StageStatus;
+      let stageLogs: LogEntry[] | undefined;
       
       if (outcome === 'PASS') {
         finalStatus = 'passed';
@@ -46,8 +112,15 @@ export function usePipeline() {
         finalStatus = 'failed';
         allPassed = false;
       } else {
-        // AUTO: Use predefined outcomes (API and UI fail by default for demo)
-        if (stageId === 'api-tests' || stageId === 'ui-e2e') {
+        // AUTO: Check Playwright results for smoke-tests and ui-e2e
+        if ((stageId === 'smoke-tests' || stageId === 'ui-e2e') && playwrightResult) {
+          finalStatus = playwrightResult.passed ? 'passed' : 'failed';
+          stageLogs = playwrightResult.logs;
+          if (!playwrightResult.passed) {
+            allPassed = false;
+          }
+        } else if (stageId === 'api-tests') {
+          // API tests still use default behavior (fail by default for demo)
           finalStatus = 'failed';
           allPassed = false;
         } else {
@@ -66,7 +139,7 @@ export function usePipeline() {
             return {
               ...stage,
               status: finalStatus,
-              logs: finalStatus === 'passed' ? getPassedLogs(stageId) : getFailedLogs(stageId),
+              logs: stageLogs || (finalStatus === 'passed' ? getPassedLogs(stageId) : getFailedLogs(stageId)),
               triageNote: finalStatus === 'failed' ? stage.triageNote : undefined,
             };
           }

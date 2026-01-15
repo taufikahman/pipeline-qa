@@ -30,11 +30,13 @@ export function Navbar({ onRunPipeline, onReset }: NavbarProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo / Brand */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-md">
-              <span className="text-primary-foreground font-bold text-sm">QA</span>
-            </div>
+            <img 
+              src={`${import.meta.env.BASE_URL}logo-fik.svg`} 
+              alt="Logo" 
+              className="w-12 h-12 rounded-lg"
+            />
             <div className="hidden sm:block">
-              <h1 className="font-bold text-foreground text-lg leading-tight">Pipeline Simulator</h1>
+              <h1 className="font-bold text-foreground text-lg leading-tight">Pipeline Quality Release Center</h1>
               <p className="text-xs text-muted-foreground">Quality Release Center</p>
             </div>
           </div>

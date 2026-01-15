@@ -41,4 +41,8 @@ export interface PipelineReport {
   stages: Stage[];
   releaseStatus: 'pending' | 'passed' | 'blocked';
   passRate: number;
+  // Stats from database (used when stages array is empty)
+  totalPassed?: number;
+  totalFailed?: number;
+  totalPending?: number;
 }
